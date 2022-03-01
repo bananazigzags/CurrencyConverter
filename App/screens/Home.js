@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   View,
   StyleSheet,
@@ -21,6 +21,8 @@ import { ConversionInput } from '../components/ConversionInput';
 import { Button } from "../components/Button"
 
 import { KeyboardSpacer } from '../components/KeyboardSpacer';
+
+import { ConversionContext } from '../util/ConversionContext'
 
 const screen = Dimensions.get('window');
 
@@ -64,16 +66,10 @@ const styles = StyleSheet.create({
 })
 
 export default ({ navigation }) => {
-  const [baseCurrency, setBaseCurrency] = useState('USD');
-  const [quoteCurrency, setQuoteCurrency] = useState("GBP");
   const [value, setValue] = useState("100");
   const conversionRate = "0.75"
   const date = new Date();
-
-  const swapCurrencies = () => {
-    setBaseCurrency(quoteCurrency);
-    setQuoteCurrency(baseCurrency);
-  }
+  const { baseCurrency, quoteCurrency, swapCurrencies } = useContext(ConversionContext);
 
   const [scrollEnabled, setScrollEnabled] = useState(false);
 
@@ -100,7 +96,9 @@ export default ({ navigation }) => {
           <ConversionInput
             text={baseCurrency}
             value={value}
-            onButtonPress={() => navigation.push("CurrencyList", { title: 'Base Currency', activeCurrency: baseCurrency})}
+            onButtonPress={() => navigation.push("CurrencyList", 
+            { title: "Base Currency", isBaseCurrency: true })
+            }
             onChangeText={text => setValue(text)}
             keyboardType="numeric"
           />
@@ -109,7 +107,7 @@ export default ({ navigation }) => {
             value={
               value && `${(parseFloat(value) * conversionRate).toFixed(2)}`
             }
-            onButtonPress={() => navigation.push("CurrencyList", { title: 'Quote Currency', activeCurrency: quoteCurrency})}
+            onButtonPress={() => navigation.push("CurrencyList", { title: 'Quote Currency', activeCurrency: quoteCurrency, isBaseCurrency: false, })}
             editable={false}
           />
 
